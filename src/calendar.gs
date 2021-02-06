@@ -7,9 +7,7 @@ function calendarHomeOnChange() {
 
   const actionBuilder = CardService.newActionResponseBuilder()
     .setNavigation(CardService.newNavigation().updateCard(card))
-    .setStateChanged(true)
-    .setNotification(CardService.newNotification()
-      .setText("Refreshed (stats were re-fetched)"));
+    .setStateChanged(true);
 
   return actionBuilder.build();
 }
@@ -21,13 +19,22 @@ function getCalendarCard() {
     .setFunctionName('calendarHomeOnChange')
     .setLoadIndicator(CardService.LoadIndicator.SPINNER);
 
+  const refreshButton = CardService.newTextButton()
+      .setText('REFRESH')
+      .setOnClickAction(action)
+      .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
+
+  const header = CardService.newDecoratedText()
+    .setText("Calendar stats")
+    .setButton(refreshButton);
+
   const attendedStats = CardService.newDecoratedText()
     .setIconUrl("https://raw.githubusercontent.com/schoraria911/google-apps-script/master/Random/Icons/ACCEPTED.png")
     .setIconAltText("CONFIRMED")
     .setTopLabel("YES")
     .setText("Accepted: " + calendarStats.attended + " invites")
     // .setBottomLabel("---")
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(false);
 
   const declinedStats = CardService.newDecoratedText()
@@ -36,7 +43,7 @@ function getCalendarCard() {
     .setTopLabel("NO")
     .setText("Cancelled: " + calendarStats.declined + " invites")
     // .setBottomLabel("---")
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(false);
 
   const maybeesStats = CardService.newDecoratedText()
@@ -45,7 +52,7 @@ function getCalendarCard() {
     .setTopLabel("MAY BE")
     .setText("Were unsure about: " + calendarStats.maybees + " invites")
     .setBottomLabel("API BUG")
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(false);
 
   const hostedStats = CardService.newDecoratedText()
@@ -54,7 +61,7 @@ function getCalendarCard() {
     .setTopLabel("CREATED")
     .setText("Hosted: " + calendarStats.hosted + " meetings")
     // .setBottomLabel("---")
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(false);
 
   const footer = CardService.newFixedFooter()
@@ -66,10 +73,11 @@ function getCalendarCard() {
     .setSecondaryButton(CardService.newTextButton()
       .setText('READ MORE')
       .setOpenLink(CardService.newOpenLink()
-        .setUrl('https://script.gs/count-von-count/?utm_source=count-von-count&utm_medium=workspace-addon&utm_campaign=calendar')));
+        .setUrl('https://script.gs/count-von-count-a-google-workspace-add-on-built-using-apps-script/?utm_source=count-von-count&utm_medium=workspace-addon&utm_campaign=calendar')));
 
   const section = CardService.newCardSection()
-    .setHeader("Calendar stats")
+    // .setHeader("Calendar stats")
+    .addWidget(header)
     .addWidget(attendedStats)
     .addWidget(declinedStats)
     .addWidget(maybeesStats)
