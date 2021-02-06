@@ -7,9 +7,7 @@ function gmailHomeOnChange() {
 
   const actionBuilder = CardService.newActionResponseBuilder()
     .setNavigation(CardService.newNavigation().updateCard(card))
-    .setStateChanged(true)
-    .setNotification(CardService.newNotification()
-      .setText("Refreshed (stats were re-fetched)"));
+    .setStateChanged(true);
 
   return actionBuilder.build();
 }
@@ -21,13 +19,22 @@ function getGmailCard() {
     .setFunctionName('gmailHomeOnChange')
     .setLoadIndicator(CardService.LoadIndicator.SPINNER);
 
+  const refreshButton = CardService.newTextButton()
+      .setText('REFRESH')
+      .setOnClickAction(action)
+      .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
+
+  const header = CardService.newDecoratedText()
+    .setText("Gmail stats")
+    .setButton(refreshButton);
+
   const inboxStats = CardService.newDecoratedText()
     .setIconUrl("https://raw.githubusercontent.com/schoraria911/google-apps-script/master/Random/Icons/INBOX.png")
     .setIconAltText("INBOX")
     .setTopLabel("INBOX")
     .setText("Total threads: " + gmailStats.INBOX.threadsTotal + " (" + gmailStats.INBOX.messagesTotal + " messages)")
     .setBottomLabel("Unread threads: " + gmailStats.INBOX.threadsUnread)
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(true);
 
   const unreadStats = CardService.newDecoratedText()
@@ -36,7 +43,7 @@ function getGmailCard() {
     .setTopLabel("UNREAD")
     .setText("Total threads: " + gmailStats.UNREAD.threadsTotal + " (" + gmailStats.UNREAD.messagesTotal + " messages)")
     .setBottomLabel("Unread threads: " + gmailStats.UNREAD.threadsUnread)
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(true);
 
   const sentStats = CardService.newDecoratedText()
@@ -45,7 +52,7 @@ function getGmailCard() {
     .setTopLabel("SENT")
     .setText("Total threads: " + gmailStats.SENT.threadsTotal + " (" + gmailStats.SENT.messagesTotal + " messages)")
     .setBottomLabel("Unread threads: " + gmailStats.SENT.threadsUnread)
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(true);
 
   const starredStats = CardService.newDecoratedText()
@@ -54,7 +61,7 @@ function getGmailCard() {
     .setTopLabel("STARRED")
     .setText("Total threads: " + gmailStats.STARRED.threadsTotal + " (" + gmailStats.STARRED.messagesTotal + " messages)")
     .setBottomLabel("Unread threads: " + gmailStats.STARRED.threadsUnread)
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(true);
 
   const draftStats = CardService.newDecoratedText()
@@ -63,7 +70,7 @@ function getGmailCard() {
     .setTopLabel("DRAFT")
     .setText("Total threads: " + gmailStats.DRAFT.threadsTotal + " (" + gmailStats.DRAFT.messagesTotal + " messages)")
     .setBottomLabel("Unread threads: " + gmailStats.DRAFT.threadsUnread)
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(true);
 
   const importantStats = CardService.newDecoratedText()
@@ -72,7 +79,7 @@ function getGmailCard() {
     .setTopLabel("IMPORTANT")
     .setText("Total threads: " + gmailStats.IMPORTANT.threadsTotal + " (" + gmailStats.IMPORTANT.messagesTotal + " messages)")
     .setBottomLabel("Unread threads: " + gmailStats.IMPORTANT.threadsUnread)
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(true);
 
   const spamStats = CardService.newDecoratedText()
@@ -81,7 +88,7 @@ function getGmailCard() {
     .setTopLabel("SPAM")
     .setText("Total threads: " + gmailStats.SPAM.threadsTotal + " (" + gmailStats.SPAM.messagesTotal + " messages)")
     .setBottomLabel("Unread threads: " + gmailStats.SPAM.threadsUnread)
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(true);
 
   const trashStats = CardService.newDecoratedText()
@@ -90,7 +97,7 @@ function getGmailCard() {
     .setTopLabel("TRASH")
     .setText("Total threads: " + gmailStats.TRASH.threadsTotal + " (" + gmailStats.TRASH.messagesTotal + " messages)")
     .setBottomLabel("Unread threads: " + gmailStats.TRASH.threadsUnread)
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(true);
 
   const chatStats = CardService.newDecoratedText()
@@ -99,7 +106,7 @@ function getGmailCard() {
     .setTopLabel("CHAT")
     .setText("Total threads: " + gmailStats.CHAT.threadsTotal + " (" + gmailStats.CHAT.messagesTotal + " messages)")
     .setBottomLabel("Unread threads: " + gmailStats.CHAT.threadsUnread)
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(true);
 
   const footer = CardService.newFixedFooter()
@@ -111,10 +118,11 @@ function getGmailCard() {
     .setSecondaryButton(CardService.newTextButton()
       .setText('READ MORE')
       .setOpenLink(CardService.newOpenLink()
-        .setUrl('https://script.gs/count-von-count/?utm_source=count-von-count&utm_medium=workspace-addon&utm_campaign=gmail')));
+        .setUrl('https://script.gs/count-von-count-a-google-workspace-add-on-built-using-apps-script/?utm_source=count-von-count&utm_medium=workspace-addon&utm_campaign=gmail')));
 
   const section = CardService.newCardSection()
-    .setHeader("Gmail stats")
+    // .setHeader("Gmail stats")
+    .addWidget(header)
     .addWidget(inboxStats)
     .addWidget(unreadStats)
     .addWidget(sentStats)
