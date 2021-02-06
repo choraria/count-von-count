@@ -7,9 +7,7 @@ function docsHomeOnChange() {
 
   const actionBuilder = CardService.newActionResponseBuilder()
     .setNavigation(CardService.newNavigation().updateCard(card))
-    .setStateChanged(true)
-    .setNotification(CardService.newNotification()
-      .setText("Refreshed (stats were re-fetched)"));
+    .setStateChanged(true);
 
   return actionBuilder.build();
 }
@@ -21,13 +19,22 @@ function getDocsCard() {
     .setFunctionName('docsHomeOnChange')
     .setLoadIndicator(CardService.LoadIndicator.SPINNER);
 
+  const refreshButton = CardService.newTextButton()
+      .setText('REFRESH')
+      .setOnClickAction(action)
+      .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
+
+  const header = CardService.newDecoratedText()
+    .setText("Docs stats")
+    .setButton(refreshButton);
+
   const docsOwned = CardService.newDecoratedText()
     .setIconUrl("https://raw.githubusercontent.com/schoraria911/google-apps-script/master/Random/Icons/SELF.png")
     .setIconAltText("CREATOR")
     .setTopLabel("WRITER")
     .setText("Created: " + docsStats.owner + " docs")
     // .setBottomLabel("---")
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(false);
 
   const docsSharedWithMe = CardService.newDecoratedText()
@@ -36,7 +43,7 @@ function getDocsCard() {
     .setTopLabel("COLLABORATOR")
     .setText("Shared with me: " + docsStats.sharedWithMe + " docs")
     .setBottomLabel("Helped: " + docsStats.helped + " people")
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(false);
 
   const footer = CardService.newFixedFooter()
@@ -48,10 +55,11 @@ function getDocsCard() {
     .setSecondaryButton(CardService.newTextButton()
       .setText('READ MORE')
       .setOpenLink(CardService.newOpenLink()
-        .setUrl('https://script.gs/count-von-count/?utm_source=count-von-count&utm_medium=workspace-addon&utm_campaign=docs')));
+        .setUrl('https://script.gs/count-von-count-a-google-workspace-add-on-built-using-apps-script/?utm_source=count-von-count&utm_medium=workspace-addon&utm_campaign=docs')));
 
   const section = CardService.newCardSection()
-    .setHeader("Docs stats")
+    // .setHeader("Docs stats")
+    .addWidget(header)
     .addWidget(docsOwned)
     .addWidget(docsSharedWithMe);
 
