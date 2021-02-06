@@ -7,9 +7,7 @@ function sheetsHomeOnChange() {
 
   const actionBuilder = CardService.newActionResponseBuilder()
     .setNavigation(CardService.newNavigation().updateCard(card))
-    .setStateChanged(true)
-    .setNotification(CardService.newNotification()
-      .setText("Refreshed (stats were re-fetched)"));
+    .setStateChanged(true);
 
   return actionBuilder.build();
 }
@@ -21,13 +19,22 @@ function getSheetsCard() {
     .setFunctionName('sheetsHomeOnChange')
     .setLoadIndicator(CardService.LoadIndicator.SPINNER);
 
+  const refreshButton = CardService.newTextButton()
+      .setText('REFRESH')
+      .setOnClickAction(action)
+      .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
+
+  const header = CardService.newDecoratedText()
+    .setText("Sheets stats")
+    .setButton(refreshButton);
+
   const sheetsOwned = CardService.newDecoratedText()
     .setIconUrl("https://raw.githubusercontent.com/schoraria911/google-apps-script/master/Random/Icons/SELF.png")
     .setIconAltText("CREATOR")
     .setTopLabel("CREATOR")
     .setText("Built: " + sheetsStats.owner + " sheets")
     // .setBottomLabel("---")
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(false);
 
   const sheetsSharedWithMe = CardService.newDecoratedText()
@@ -36,7 +43,7 @@ function getSheetsCard() {
     .setTopLabel("COLLABORATOR")
     .setText("Shared with me: " + sheetsStats.sharedWithMe + " sheets")
     .setBottomLabel("Helped: " + sheetsStats.helped + " people")
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(false);
 
   const footer = CardService.newFixedFooter()
@@ -48,10 +55,11 @@ function getSheetsCard() {
     .setSecondaryButton(CardService.newTextButton()
       .setText('READ MORE')
       .setOpenLink(CardService.newOpenLink()
-        .setUrl('https://script.gs/count-von-count/?utm_source=count-von-count&utm_medium=workspace-addon&utm_campaign=sheets')));
+        .setUrl('https://script.gs/count-von-count-a-google-workspace-add-on-built-using-apps-script/?utm_source=count-von-count&utm_medium=workspace-addon&utm_campaign=sheets')));
 
   const section = CardService.newCardSection()
-    .setHeader("Sheets stats")
+    // .setHeader("Sheets stats")
+    .addWidget(header)
     .addWidget(sheetsOwned)
     .addWidget(sheetsSharedWithMe);
 
