@@ -1,0 +1,100 @@
+{
+  "dependencies": {
+    "enabledAdvancedServices": [
+      {
+        "userSymbol": "Gmail",
+        "version": "v1",
+        "serviceId": "gmail"
+      },
+      {
+        "userSymbol": "Drive",
+        "version": "v2",
+        "serviceId": "drive"
+      },
+      {
+        "userSymbol": "Calendar",
+        "version": "v3",
+        "serviceId": "calendar"
+      }
+    ]
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/drive.metadata.readonly",
+    "https://www.googleapis.com/auth/gmail.labels",
+    "https://www.googleapis.com/auth/calendar.events.readonly",
+    "https://www.googleapis.com/auth/gmail.addons.execute",
+    "https://www.googleapis.com/auth/calendar.addons.execute"
+  ],
+  "addOns": {
+    "common": {
+      "name": "Count von Count",
+      "logoUrl": "https://script.gs/favicon.png",
+      "layoutProperties": {
+        "primaryColor": "#7e57c2",
+        "secondaryColor": "#7c4dff"
+      },
+      "homepageTrigger": {
+        "enabled": true,
+        "runFunction": "commonHome"
+      },
+      "openLinkUrlPrefixes": [
+        "https://twitter.com/",
+        "https://script.gs/",
+        "https://raw.githubusercontent.com/schoraria911/",
+        "https://workspace.google.com/marketplace/app/"
+      ],
+      "universalActions": [
+        {
+          "label": "Privacy",
+          "openLink": "https://script.gs/count-von-count-privacy-policy/?utm_source=count-von-count&utm_medium=workspace-addon"
+        },
+        {
+          "label": "Terms",
+          "openLink": "https://script.gs/terms/?utm_source=count-von-count&utm_medium=workspace-addon"
+        },
+        {
+          "label": "Rate this!",
+          "openLink": "https://workspace.google.com/marketplace/app/count_von_count/222600962484"
+        }
+      ]
+    },
+    "calendar": {
+      "homepageTrigger": {
+        "enabled": true,
+        "runFunction": "calendarHome"
+      }
+    },
+    "drive": {
+      "homepageTrigger": {
+        "enabled": true,
+        "runFunction": "driveHome"
+      }
+    },
+    "gmail": {
+      "homepageTrigger": {
+        "enabled": true,
+        "runFunction": "gmailHome"
+      }
+    },
+    "docs": {
+      "homepageTrigger": {
+        "enabled": true,
+        "runFunction": "docsHome"
+      }
+    },
+    "sheets": {
+      "homepageTrigger": {
+        "enabled": true,
+        "runFunction": "sheetsHome"
+      }
+    },
+    "slides": {
+      "homepageTrigger": {
+        "enabled": true,
+        "runFunction": "slidesHome"
+      }
+    }
+  }
+}
