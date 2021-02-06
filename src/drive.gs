@@ -7,9 +7,7 @@ function driveHomeOnChange() {
 
   const actionBuilder = CardService.newActionResponseBuilder()
     .setNavigation(CardService.newNavigation().updateCard(card))
-    .setStateChanged(true)
-    .setNotification(CardService.newNotification()
-      .setText("Refreshed (stats were re-fetched)"));
+    .setStateChanged(true);
 
   return actionBuilder.build();
 }
@@ -21,13 +19,22 @@ function getDriveCard() {
     .setFunctionName('driveHomeOnChange')
     .setLoadIndicator(CardService.LoadIndicator.SPINNER);
 
+  const refreshButton = CardService.newTextButton()
+      .setText('REFRESH')
+      .setOnClickAction(action)
+      .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
+
+  const header = CardService.newDecoratedText()
+    .setText("Drive stats")
+    .setButton(refreshButton);
+
   const fileCard = CardService.newDecoratedText()
     .setIconUrl("https://raw.githubusercontent.com/schoraria911/google-apps-script/master/Random/Icons/FILE.png")
     .setIconAltText("FILE")
     .setTopLabel("FILES")
     .setText("Creator: " + driveStats.fileStats.ownedByMe + " files")
     .setBottomLabel("Shared with me: " + driveStats.fileStats.sharedWithMe + " files")
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(false);
 
   const folderCard = CardService.newDecoratedText()
@@ -36,7 +43,7 @@ function getDriveCard() {
     .setTopLabel("FOLDERS")
     .setText("Creator: " + driveStats.folderStats.ownedByMe + " folders")
     .setBottomLabel("Shared with me: " + driveStats.folderStats.sharedWithMe + " folders")
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(false);
 
   const imageCard = CardService.newDecoratedText()
@@ -45,7 +52,7 @@ function getDriveCard() {
     .setTopLabel("IMAGES")
     .setText("Maker: " + driveStats.imageStats.ownedByMe + " images")
     .setBottomLabel("Shared with me: " + driveStats.imageStats.sharedWithMe + " images")
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(false);
 
   const audioCard = CardService.newDecoratedText()
@@ -54,7 +61,7 @@ function getDriveCard() {
     .setTopLabel("AUDIO")
     .setText("Maker: " + driveStats.audioStats.ownedByMe + " audio files")
     .setBottomLabel("Shared with me: " + driveStats.audioStats.sharedWithMe + " audio files")
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(false);
 
   const videoCard = CardService.newDecoratedText()
@@ -63,7 +70,7 @@ function getDriveCard() {
     .setTopLabel("VIDEOS")
     .setText("Maker: " + driveStats.videoStats.ownedByMe + " videos")
     .setBottomLabel("Shared with me: " + driveStats.videoStats.sharedWithMe + " videos")
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(false);
 
   const scriptCard = CardService.newDecoratedText()
@@ -72,7 +79,7 @@ function getDriveCard() {
     .setTopLabel("SCRIPTS")
     .setText("Builder: " + driveStats.scriptStats.ownedByMe + " scripts")
     .setBottomLabel("Shared with me: " + driveStats.scriptStats.sharedWithMe + " scripts")
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(false);
 
   const drawingCard = CardService.newDecoratedText()
@@ -81,7 +88,7 @@ function getDriveCard() {
     .setTopLabel("DRAWINGS")
     .setText("Builder: " + driveStats.drawingStats.ownedByMe + " drawings")
     .setBottomLabel("Shared with me: " + driveStats.drawingStats.sharedWithMe + " drawings")
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(false);
 
   const siteCard = CardService.newDecoratedText()
@@ -90,7 +97,7 @@ function getDriveCard() {
     .setTopLabel("SITES")
     .setText("Builder: " + driveStats.siteStats.ownedByMe + " sites")
     .setBottomLabel("Shared with me: " + driveStats.siteStats.sharedWithMe + " sites")
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(false);
 
   const footer = CardService.newFixedFooter()
@@ -102,10 +109,11 @@ function getDriveCard() {
     .setSecondaryButton(CardService.newTextButton()
       .setText('READ MORE')
       .setOpenLink(CardService.newOpenLink()
-        .setUrl('https://script.gs/count-von-count/?utm_source=count-von-count&utm_medium=workspace-addon&utm_campaign=drive')));
+        .setUrl('https://script.gs/count-von-count-a-google-workspace-add-on-built-using-apps-script/?utm_source=count-von-count&utm_medium=workspace-addon&utm_campaign=drive')));
 
   const section = CardService.newCardSection()
-    .setHeader("Drive stats")
+    // .setHeader("Drive stats")
+    .addWidget(header)
     .addWidget(fileCard)
     .addWidget(folderCard)
     .addWidget(imageCard)
