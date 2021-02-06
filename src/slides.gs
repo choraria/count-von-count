@@ -7,9 +7,7 @@ function slidesHomeOnChange() {
 
   const actionBuilder = CardService.newActionResponseBuilder()
     .setNavigation(CardService.newNavigation().updateCard(card))
-    .setStateChanged(true)
-    .setNotification(CardService.newNotification()
-      .setText("Refreshed (stats were re-fetched)"));
+    .setStateChanged(true);
 
   return actionBuilder.build();
 }
@@ -21,13 +19,22 @@ function getSlidesCard() {
     .setFunctionName('slidesHomeOnChange')
     .setLoadIndicator(CardService.LoadIndicator.SPINNER);
 
+  const refreshButton = CardService.newTextButton()
+      .setText('REFRESH')
+      .setOnClickAction(action)
+      .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
+
+  const header = CardService.newDecoratedText()
+    .setText("Slides stats")
+    .setButton(refreshButton);
+
   const slidesOwned = CardService.newDecoratedText()
     .setIconUrl("https://raw.githubusercontent.com/schoraria911/google-apps-script/master/Random/Icons/SELF.png")
     .setIconAltText("CREATOR")
     .setTopLabel("PRESENTER")
     .setText("Created: " + slidesStats.owner + " slides")
     // .setBottomLabel("---")
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(false);
 
   const slidesSharedWithMe = CardService.newDecoratedText()
@@ -36,7 +43,7 @@ function getSlidesCard() {
     .setTopLabel("COLLABORATOR")
     .setText("Shared with me: " + slidesStats.sharedWithMe + " slides")
     .setBottomLabel("Helped: " + slidesStats.helped + " people")
-    .setOnClickAction(action)
+    // .setOnClickAction(action)
     .setWrapText(false);
 
   const footer = CardService.newFixedFooter()
@@ -48,10 +55,11 @@ function getSlidesCard() {
     .setSecondaryButton(CardService.newTextButton()
       .setText('READ MORE')
       .setOpenLink(CardService.newOpenLink()
-        .setUrl('https://script.gs/count-von-count/?utm_source=count-von-count&utm_medium=workspace-addon&utm_campaign=slides')));
+        .setUrl('https://script.gs/count-von-count-a-google-workspace-add-on-built-using-apps-script/?utm_source=count-von-count&utm_medium=workspace-addon&utm_campaign=slides')));
 
   const section = CardService.newCardSection()
-    .setHeader("Slides stats")
+    // .setHeader("Slides stats")
+    .addWidget(header)
     .addWidget(slidesOwned)
     .addWidget(slidesSharedWithMe);
 
