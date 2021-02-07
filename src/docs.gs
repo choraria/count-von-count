@@ -20,19 +20,21 @@ function getDocsCard() {
     .setLoadIndicator(CardService.LoadIndicator.SPINNER);
 
   const refreshButton = CardService.newTextButton()
-      .setText('REFRESH')
-      .setOnClickAction(action)
-      .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
+    .setText('REFRESH')
+    .setOnClickAction(action)
+    .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
 
   const header = CardService.newDecoratedText()
     .setText("Docs stats")
     .setButton(refreshButton);
 
+  docsStats.timeOut ? header.setTopLabel("TOO MANY DOCS!").setBottomLabel("Partial stats fetched.") : header;
+
   const docsOwned = CardService.newDecoratedText()
     .setIconUrl("https://raw.githubusercontent.com/schoraria911/google-apps-script/master/Random/Icons/SELF.png")
     .setIconAltText("CREATOR")
     .setTopLabel("WRITER")
-    .setText("Created: " + docsStats.owner + " docs")
+    .setText(`Created: ${docsStats.timeOut && docsStats.owner > 0 ? "~" + docsStats.owner : docsStats.owner} docs`)
     // .setBottomLabel("---")
     // .setOnClickAction(action)
     .setWrapText(false);
@@ -41,8 +43,8 @@ function getDocsCard() {
     .setIconUrl("https://raw.githubusercontent.com/schoraria911/google-apps-script/master/Random/Icons/SHARED.png")
     .setIconAltText("SHARED")
     .setTopLabel("COLLABORATOR")
-    .setText("Shared with me: " + docsStats.sharedWithMe + " docs")
-    .setBottomLabel("Helped: " + docsStats.helped + " people")
+    .setText(`Shared with me: ${docsStats.timeOut && docsStats.sharedWithMe > 0 ? "~" + docsStats.sharedWithMe : docsStats.sharedWithMe} docs`)
+    .setBottomLabel(`Helped: ${docsStats.timeOut && docsStats.helped > 0 ? "~" + docsStats.helped : docsStats.helped} people`)
     // .setOnClickAction(action)
     .setWrapText(false);
 
@@ -82,29 +84,37 @@ function docsData() {
 
   let otherOwners = [];
 
+  let timeOut = true;
+
   do {
-    allDocs = Drive.Files.list({
-      q: "mimeType = 'application/vnd.google-apps.document' and ('me' in owners or sharedWithMe = true) and trashed = false",
-      pageToken: allDocs.nextPageToken,
-      maxResults: 460,
-    });
+    if (!isTimeUp(start)) {
+      timeOut = false;
+      allDocs = Drive.Files.list({
+        q: "mimeType = 'application/vnd.google-apps.document' and ('me' in owners or sharedWithMe = true) and trashed = false",
+        pageToken: allDocs.nextPageToken,
+        maxResults: 460,
+      });
 
-    let items = allDocs.items;
-    let docsOwnedByAuthUser = items.filter(item => item.owners[0].isAuthenticatedUser).length;
-    let docsSharedWithAuthUser = items.filter(item => !item.owners[0].isAuthenticatedUser);
-    docOwner += docsOwnedByAuthUser;
-    docSharedWithMe += docsSharedWithAuthUser.length;
+      let items = allDocs.items;
+      let docsOwnedByAuthUser = items.filter(item => item.owners[0].isAuthenticatedUser).length;
+      let docsSharedWithAuthUser = items.filter(item => !item.owners[0].isAuthenticatedUser);
+      docOwner += docsOwnedByAuthUser;
+      docSharedWithMe += docsSharedWithAuthUser.length;
 
-    for (var i = 0; i < docsSharedWithAuthUser.length; i++) {
-      otherOwners.push(docsSharedWithAuthUser[i].owners[0].emailAddress);
+      for (var i = 0; i < docsSharedWithAuthUser.length; i++) {
+        otherOwners.push(docsSharedWithAuthUser[i].owners[0].emailAddress);
+      }
+    } else {
+      timeOut = true;
+      break;
     }
-
   } while (allDocs.nextPageToken);
 
   docsCount = {
     "owner": docOwner,
     "sharedWithMe": docSharedWithMe,
-    "helped": otherOwners.filter((x, i, a) => a.indexOf(x) === i).length
+    "helped": otherOwners.filter((x, i, a) => a.indexOf(x) === i).length,
+    "timeOut": timeOut
   }
   console.log(docsCount);
   return docsCount;
