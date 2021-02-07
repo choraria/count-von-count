@@ -28,12 +28,14 @@ function getDriveCard() {
     .setText("Drive stats")
     .setButton(refreshButton);
 
+  driveStats.timeOut.status ? header.setTopLabel("TOO MANY FILES!").setBottomLabel("Partial stats fetched.") : header;
+
   const fileCard = CardService.newDecoratedText()
     .setIconUrl("https://raw.githubusercontent.com/schoraria911/google-apps-script/master/Random/Icons/FILE.png")
     .setIconAltText("FILE")
     .setTopLabel("FILES")
-    .setText("Creator: " + driveStats.fileStats.ownedByMe + " files")
-    .setBottomLabel("Shared with me: " + driveStats.fileStats.sharedWithMe + " files")
+    .setText(`Creator: ${driveStats.timeOut.status && driveStats.fileStats.ownedByMe > 0 ? "~" + driveStats.fileStats.ownedByMe : driveStats.fileStats.ownedByMe} files`)
+    .setBottomLabel(`Shared with me: ${driveStats.timeOut.status && driveStats.fileStats.sharedWithMe > 0 ? "~" + driveStats.fileStats.sharedWithMe : driveStats.fileStats.sharedWithMe} files`)
     // .setOnClickAction(action)
     .setWrapText(false);
 
@@ -41,8 +43,8 @@ function getDriveCard() {
     .setIconUrl("https://raw.githubusercontent.com/schoraria911/google-apps-script/master/Random/Icons/FOLDER.png")
     .setIconAltText("FOLDER")
     .setTopLabel("FOLDERS")
-    .setText("Creator: " + driveStats.folderStats.ownedByMe + " folders")
-    .setBottomLabel("Shared with me: " + driveStats.folderStats.sharedWithMe + " folders")
+    .setText(`Creator: ${driveStats.timeOut.status && driveStats.folderStats.ownedByMe > 0 ? "~" + driveStats.folderStats.ownedByMe : driveStats.folderStats.ownedByMe} folders`)
+    .setBottomLabel(`Shared with me: ${driveStats.timeOut.status && driveStats.folderStats.sharedWithMe > 0 ? "~" + driveStats.folderStats.sharedWithMe : driveStats.folderStats.sharedWithMe} folders`)
     // .setOnClickAction(action)
     .setWrapText(false);
 
@@ -50,8 +52,8 @@ function getDriveCard() {
     .setIconUrl("https://raw.githubusercontent.com/schoraria911/google-apps-script/master/Random/Icons/IMAGE.png")
     .setIconAltText("IMAGE")
     .setTopLabel("IMAGES")
-    .setText("Maker: " + driveStats.imageStats.ownedByMe + " images")
-    .setBottomLabel("Shared with me: " + driveStats.imageStats.sharedWithMe + " images")
+    .setText(`Maker: ${driveStats.timeOut.status && driveStats.imageStats.ownedByMe > 0 ? "~" + driveStats.imageStats.ownedByMe : driveStats.imageStats.ownedByMe} images`)
+    .setBottomLabel(`Shared with me: ${driveStats.timeOut.status && driveStats.imageStats.sharedWithMe > 0 ? "~" + driveStats.imageStats.sharedWithMe : driveStats.imageStats.sharedWithMe} images`)
     // .setOnClickAction(action)
     .setWrapText(false);
 
@@ -59,8 +61,8 @@ function getDriveCard() {
     .setIconUrl("https://raw.githubusercontent.com/schoraria911/google-apps-script/master/Random/Icons/AUDIO.png")
     .setIconAltText("AUDIO")
     .setTopLabel("AUDIO")
-    .setText("Maker: " + driveStats.audioStats.ownedByMe + " audio files")
-    .setBottomLabel("Shared with me: " + driveStats.audioStats.sharedWithMe + " audio files")
+    .setText(`Maker: ${driveStats.timeOut.status && driveStats.audioStats.ownedByMe > 0 ? "~" + driveStats.audioStats.ownedByMe : driveStats.audioStats.ownedByMe} audio files`)
+    .setBottomLabel(`Shared with me: ${driveStats.timeOut.status && driveStats.audioStats.sharedWithMe > 0 ? "~" + driveStats.audioStats.sharedWithMe : driveStats.audioStats.sharedWithMe} audio files`)
     // .setOnClickAction(action)
     .setWrapText(false);
 
@@ -68,8 +70,8 @@ function getDriveCard() {
     .setIconUrl("https://raw.githubusercontent.com/schoraria911/google-apps-script/master/Random/Icons/VIDEO.png")
     .setIconAltText("VIDEO")
     .setTopLabel("VIDEOS")
-    .setText("Maker: " + driveStats.videoStats.ownedByMe + " videos")
-    .setBottomLabel("Shared with me: " + driveStats.videoStats.sharedWithMe + " videos")
+    .setText(`Maker: ${driveStats.timeOut.status && driveStats.videoStats.ownedByMe > 0 ? "~" + driveStats.videoStats.ownedByMe : driveStats.videoStats.ownedByMe} videos`)
+    .setBottomLabel(`Shared with me: ${driveStats.timeOut.status && driveStats.videoStats.sharedWithMe > 0 ? "~" + driveStats.videoStats.sharedWithMe : driveStats.videoStats.sharedWithMe} videos`)
     // .setOnClickAction(action)
     .setWrapText(false);
 
@@ -77,8 +79,8 @@ function getDriveCard() {
     .setIconUrl("https://raw.githubusercontent.com/schoraria911/google-apps-script/master/Random/Icons/SCRIPT.png")
     .setIconAltText("SCRIPT")
     .setTopLabel("SCRIPTS")
-    .setText("Builder: " + driveStats.scriptStats.ownedByMe + " scripts")
-    .setBottomLabel("Shared with me: " + driveStats.scriptStats.sharedWithMe + " scripts")
+    .setText(`Builder: ${driveStats.timeOut.status && driveStats.scriptStats.ownedByMe > 0 ? "~" + driveStats.scriptStats.ownedByMe : driveStats.scriptStats.ownedByMe} scripts`)
+    .setBottomLabel(`Shared with me: ${driveStats.timeOut.status && driveStats.scriptStats.sharedWithMe > 0 ? "~" + driveStats.scriptStats.sharedWithMe : driveStats.scriptStats.sharedWithMe} scripts`)
     // .setOnClickAction(action)
     .setWrapText(false);
 
@@ -86,8 +88,8 @@ function getDriveCard() {
     .setIconUrl("https://raw.githubusercontent.com/schoraria911/google-apps-script/master/Random/Icons/DRAWING.png")
     .setIconAltText("DRAWING")
     .setTopLabel("DRAWINGS")
-    .setText("Builder: " + driveStats.drawingStats.ownedByMe + " drawings")
-    .setBottomLabel("Shared with me: " + driveStats.drawingStats.sharedWithMe + " drawings")
+    .setText(`Builder: ${driveStats.timeOut.status && driveStats.drawingStats.ownedByMe > 0 ? "~" + driveStats.drawingStats.ownedByMe : driveStats.drawingStats.ownedByMe} drawings`)
+    .setBottomLabel(`Shared with me: ${driveStats.timeOut.status && driveStats.drawingStats.sharedWithMe > 0 ? "~" + driveStats.drawingStats.sharedWithMe : driveStats.drawingStats.sharedWithMe} drawings`)
     // .setOnClickAction(action)
     .setWrapText(false);
 
@@ -156,50 +158,57 @@ function driveData() {
   let drawingsSharedWithMe = 0;
   let sitesSharedWithMe = 0;
 
+  let timeOut = true;
+
   do {
-    allMyStuff = Drive.Files.list({
-      q: "('me' in owners or sharedWithMe = true) and trashed = false",
-      pageToken: allMyStuff.nextPageToken,
-      maxResults: 460,
-    });
+    if (!isTimeUp(start)) {
+      timeOut = false;
+      allMyStuff = Drive.Files.list({
+        q: "('me' in owners or sharedWithMe = true) and trashed = false",
+        pageToken: allMyStuff.nextPageToken,
+        maxResults: 460,
+      });
 
-    let items = allMyStuff.items;
+      let items = allMyStuff.items;
 
-    let foldersType = items.filter(item => item.mimeType == "application/vnd.google-apps.folder");
-    let imagesType = items.filter(item => item.mimeType.includes("image"));
-    let audiosType = items.filter(item => item.mimeType.includes("audio"));
-    let videosType = items.filter(item => item.mimeType.includes("video"));
-    let scriptsType = items.filter(item => item.mimeType == "application/vnd.google-apps.script");
-    let drawingsType = items.filter(item => item.mimeType == "application/vnd.google-apps.drawing");
-    let sitesType = items.filter(item => item.mimeType == "application/vnd.google-apps.site");
+      let foldersType = items.filter(item => item.mimeType == "application/vnd.google-apps.folder");
+      let imagesType = items.filter(item => item.mimeType.includes("image"));
+      let audiosType = items.filter(item => item.mimeType.includes("audio"));
+      let videosType = items.filter(item => item.mimeType.includes("video"));
+      let scriptsType = items.filter(item => item.mimeType == "application/vnd.google-apps.script");
+      let drawingsType = items.filter(item => item.mimeType == "application/vnd.google-apps.drawing");
+      let sitesType = items.filter(item => item.mimeType == "application/vnd.google-apps.site");
 
-    let filesOwnedByAuthUser = items.filter(item => item.owners[0].isAuthenticatedUser).length;
-    let foldersOwnedByAuthUser = foldersType.filter(item => item.owners[0].isAuthenticatedUser).length;
-    let imagesOwnedByAuthUser = imagesType.filter(item => item.owners[0].isAuthenticatedUser).length;
-    let audiosOwnedByAuthUser = audiosType.filter(item => item.owners[0].isAuthenticatedUser).length;
-    let videosOwnedByAuthUser = videosType.filter(item => item.owners[0].isAuthenticatedUser).length;
-    let scriptsOwnedByAuthUser = scriptsType.filter(item => item.owners[0].isAuthenticatedUser).length;
-    let drawingsOwnedByAuthUser = drawingsType.filter(item => item.owners[0].isAuthenticatedUser).length;
-    let sitesOwnedByAuthUser = sitesType.filter(item => item.owners[0].isAuthenticatedUser).length;
+      let filesOwnedByAuthUser = items.filter(item => item.owners[0].isAuthenticatedUser).length;
+      let foldersOwnedByAuthUser = foldersType.filter(item => item.owners[0].isAuthenticatedUser).length;
+      let imagesOwnedByAuthUser = imagesType.filter(item => item.owners[0].isAuthenticatedUser).length;
+      let audiosOwnedByAuthUser = audiosType.filter(item => item.owners[0].isAuthenticatedUser).length;
+      let videosOwnedByAuthUser = videosType.filter(item => item.owners[0].isAuthenticatedUser).length;
+      let scriptsOwnedByAuthUser = scriptsType.filter(item => item.owners[0].isAuthenticatedUser).length;
+      let drawingsOwnedByAuthUser = drawingsType.filter(item => item.owners[0].isAuthenticatedUser).length;
+      let sitesOwnedByAuthUser = sitesType.filter(item => item.owners[0].isAuthenticatedUser).length;
 
-    filesOwnedByMe += filesOwnedByAuthUser;
-    foldersOwnedByMe += foldersOwnedByAuthUser;
-    imagesOwnedByMe += imagesOwnedByAuthUser;
-    audiosOwnedByMe += audiosOwnedByAuthUser;
-    videosOwnedByMe += videosOwnedByAuthUser;
-    scriptsOwnedByMe += scriptsOwnedByAuthUser;
-    drawingsOwnedByMe += drawingsOwnedByAuthUser;
-    sitesOwnedByMe += sitesOwnedByAuthUser;
+      filesOwnedByMe += filesOwnedByAuthUser;
+      foldersOwnedByMe += foldersOwnedByAuthUser;
+      imagesOwnedByMe += imagesOwnedByAuthUser;
+      audiosOwnedByMe += audiosOwnedByAuthUser;
+      videosOwnedByMe += videosOwnedByAuthUser;
+      scriptsOwnedByMe += scriptsOwnedByAuthUser;
+      drawingsOwnedByMe += drawingsOwnedByAuthUser;
+      sitesOwnedByMe += sitesOwnedByAuthUser;
 
-    filesSharedWithMe += (items.length - filesOwnedByAuthUser);
-    foldersSharedWithMe += (foldersType.length - foldersOwnedByAuthUser);
-    imagesSharedWithMe += (imagesType.length - imagesOwnedByAuthUser);
-    audiosSharedWithMe += (audiosType.length - audiosOwnedByAuthUser);
-    videosSharedWithMe += (videosType.length - videosOwnedByAuthUser);
-    scriptsSharedWithMe += (scriptsType.length - scriptsOwnedByAuthUser);
-    drawingsSharedWithMe += (drawingsType.length - drawingsOwnedByAuthUser);
-    sitesSharedWithMe += (sitesType.length - sitesOwnedByAuthUser);
-
+      filesSharedWithMe += (items.length - filesOwnedByAuthUser);
+      foldersSharedWithMe += (foldersType.length - foldersOwnedByAuthUser);
+      imagesSharedWithMe += (imagesType.length - imagesOwnedByAuthUser);
+      audiosSharedWithMe += (audiosType.length - audiosOwnedByAuthUser);
+      videosSharedWithMe += (videosType.length - videosOwnedByAuthUser);
+      scriptsSharedWithMe += (scriptsType.length - scriptsOwnedByAuthUser);
+      drawingsSharedWithMe += (drawingsType.length - drawingsOwnedByAuthUser);
+      sitesSharedWithMe += (sitesType.length - sitesOwnedByAuthUser);
+    } else {
+      timeOut = true;
+      break;
+    }
   } while (allMyStuff.nextPageToken);
 
   driveStats["fileStats"] = {
@@ -233,6 +242,9 @@ function driveData() {
   driveStats["siteStats"] = {
     "ownedByMe": sitesOwnedByMe,
     "sharedWithMe": sitesSharedWithMe
+  };
+  driveStats["timeOut"] = {
+    "status": timeOut
   };
 
   console.log(driveStats);
