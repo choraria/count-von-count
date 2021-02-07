@@ -26,5 +26,5 @@ function commonHome() {
 
 function isTimeUp(start) {
   var now = new Date();
-  return now.getTime() - start.getTime() > 20000;
+  return now.getTime() - start.getTime() > 28000;
 }
