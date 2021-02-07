@@ -11,7 +11,7 @@ function commonHome() {
     .setSecondaryButton(CardService.newTextButton()
       .setText('READ MORE')
       .setOpenLink(CardService.newOpenLink()
-        .setUrl('https://script.gs/count-von-count/?utm_source=count-von-count&utm_medium=workspace-addon&utm_campaign=common')));
+        .setUrl('https://script.gs/count-von-count-a-google-workspace-add-on-built-using-apps-script/?utm_source=count-von-count&utm_medium=workspace-addon&utm_campaign=common')));
 
   const section = CardService.newCardSection()
     .addWidget(text);
@@ -22,4 +22,9 @@ function commonHome() {
     .build();
 
   return card;
+}
+
+function isTimeUp(start) {
+  var now = new Date();
+  return now.getTime() - start.getTime() > 20000;
 }
