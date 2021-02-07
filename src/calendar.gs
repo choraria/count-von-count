@@ -20,9 +20,9 @@ function getCalendarCard() {
     .setLoadIndicator(CardService.LoadIndicator.SPINNER);
 
   const refreshButton = CardService.newTextButton()
-      .setText('REFRESH')
-      .setOnClickAction(action)
-      .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
+    .setText('REFRESH')
+    .setOnClickAction(action)
+    .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
 
   const header = CardService.newDecoratedText()
     .setText("Calendar stats")
@@ -92,6 +92,8 @@ function getCalendarCard() {
 }
 
 function calendarData() {
+  const start = new Date();
+
   let eventsCount = {};
   let events = {};
 
@@ -107,10 +109,10 @@ function calendarData() {
     });
 
     let items = events.items;
-    attended = attended + items.filter(event => event.status == "confirmed").length;
-    declined = declined + items.filter(event => event.status == "cancelled").length;
-    maybees = maybees + items.filter(event => event.status == "tentative").length;
-    hosted = hosted + items.filter(function (event) {
+    attended += items.filter(event => event.status == "confirmed").length;
+    declined += items.filter(event => event.status == "cancelled").length;
+    maybees += items.filter(event => event.status == "tentative").length;
+    hosted += items.filter(function (event) {
       let selfEvents;
       try {
         selfEvents = event.creator.self;
@@ -120,14 +122,16 @@ function calendarData() {
       } catch (e) {
         // console.log({ e });
       }
-    }).length
+    }).length;
 
   } while (events.nextPageToken);
 
-  eventsCount["attended"] = attended;
-  eventsCount["declined"] = declined;
-  eventsCount["maybees"] = maybees;
-  eventsCount["hosted"] = hosted;
+  eventsCount = {
+    "attended": attended,
+    "declined": declined,
+    "maybees": maybees,
+    "hosted": hosted
+  }
 
   console.log(eventsCount);
   return eventsCount;
