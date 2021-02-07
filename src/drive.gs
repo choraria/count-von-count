@@ -20,9 +20,9 @@ function getDriveCard() {
     .setLoadIndicator(CardService.LoadIndicator.SPINNER);
 
   const refreshButton = CardService.newTextButton()
-      .setText('REFRESH')
-      .setOnClickAction(action)
-      .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
+    .setText('REFRESH')
+    .setOnClickAction(action)
+    .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
 
   const header = CardService.newDecoratedText()
     .setText("Drive stats")
@@ -132,11 +132,13 @@ function getDriveCard() {
 }
 
 function driveData() {
+  const start = new Date();
+
   let driveStats = {};
 
-  let stuffOwnedByMe = {};
+  let allMyStuff = {};
 
-  let filesOwnerdByMe = 0;
+  let filesOwnedByMe = 0;
   let foldersOwnedByMe = 0;
   let imagesOwnedByMe = 0;
   let audiosOwnedByMe = 0;
@@ -144,52 +146,6 @@ function driveData() {
   let scriptsOwnedByMe = 0;
   let drawingsOwnedByMe = 0;
   let sitesOwnedByMe = 0;
-
-  do {
-    stuffOwnedByMe = Drive.Files.list({
-      q: "'me' in owners and trashed = false",
-      pageToken: stuffOwnedByMe.nextPageToken,
-      maxResults: 1000,
-    });
-    let items = stuffOwnedByMe.items;
-
-    filesOwnerdByMe = filesOwnerdByMe + items.length;
-    foldersOwnedByMe = foldersOwnedByMe + items.filter(item => item.mimeType == "application/vnd.google-apps.folder").length;
-    imagesOwnedByMe = imagesOwnedByMe + items.filter(item => item.mimeType.includes("image")).length;
-    audiosOwnedByMe = audiosOwnedByMe + items.filter(item => item.mimeType.includes("audio")).length;
-    videosOwnedByMe = videosOwnedByMe + items.filter(item => item.mimeType.includes("video")).length;
-    scriptsOwnedByMe = scriptsOwnedByMe + items.filter(item => item.mimeType == "application/vnd.google-apps.script").length;
-    drawingsOwnedByMe = drawingsOwnedByMe + items.filter(item => item.mimeType == "application/vnd.google-apps.drawing").length;
-    sitesOwnedByMe = sitesOwnedByMe + items.filter(item => item.mimeType == "application/vnd.google-apps.site").length;
-
-  } while (stuffOwnedByMe.nextPageToken);
-
-  driveStats["fileStats"] = {
-    "ownedByMe": filesOwnerdByMe
-  };
-  driveStats["folderStats"] = {
-    "ownedByMe": foldersOwnedByMe
-  };
-  driveStats["imageStats"] = {
-    "ownedByMe": imagesOwnedByMe
-  };
-  driveStats["audioStats"] = {
-    "ownedByMe": audiosOwnedByMe
-  };
-  driveStats["videoStats"] = {
-    "ownedByMe": videosOwnedByMe
-  };
-  driveStats["scriptStats"] = {
-    "ownedByMe": scriptsOwnedByMe
-  };
-  driveStats["drawingStats"] = {
-    "ownedByMe": drawingsOwnedByMe
-  };
-  driveStats["siteStats"] = {
-    "ownedByMe": sitesOwnedByMe
-  };
-
-  let stuffSharedWithMe = {};
 
   let filesSharedWithMe = 0;
   let foldersSharedWithMe = 0;
@@ -201,32 +157,83 @@ function driveData() {
   let sitesSharedWithMe = 0;
 
   do {
-    stuffSharedWithMe = Drive.Files.list({
-      q: "sharedWithMe = true and trashed = false",
-      pageToken: stuffSharedWithMe.nextPageToken,
-      maxResults: 1000,
+    allMyStuff = Drive.Files.list({
+      q: "('me' in owners or sharedWithMe = true) and trashed = false",
+      pageToken: allMyStuff.nextPageToken,
+      maxResults: 460,
     });
-    let items = stuffSharedWithMe.items;
 
-    filesSharedWithMe = filesSharedWithMe + items.length;
-    foldersSharedWithMe = foldersSharedWithMe + items.filter(item => item.mimeType == "application/vnd.google-apps.folder").length;
-    imagesSharedWithMe = imagesSharedWithMe + items.filter(item => item.mimeType.includes("image")).length;
-    audiosSharedWithMe = audiosSharedWithMe + items.filter(item => item.mimeType.includes("audio")).length;
-    videosSharedWithMe = videosSharedWithMe + items.filter(item => item.mimeType.includes("video")).length;
-    scriptsSharedWithMe = scriptsSharedWithMe + items.filter(item => item.mimeType == "application/vnd.google-apps.script").length;
-    drawingsSharedWithMe = drawingsSharedWithMe + items.filter(item => item.mimeType == "application/vnd.google-apps.drawing").length;
-    sitesSharedWithMe = sitesSharedWithMe + items.filter(item => item.mimeType == "application/vnd.google-apps.site").length;
+    let items = allMyStuff.items;
 
-  } while (stuffSharedWithMe.nextPageToken);
+    let foldersType = items.filter(item => item.mimeType == "application/vnd.google-apps.folder");
+    let imagesType = items.filter(item => item.mimeType.includes("image"));
+    let audiosType = items.filter(item => item.mimeType.includes("audio"));
+    let videosType = items.filter(item => item.mimeType.includes("video"));
+    let scriptsType = items.filter(item => item.mimeType == "application/vnd.google-apps.script");
+    let drawingsType = items.filter(item => item.mimeType == "application/vnd.google-apps.drawing");
+    let sitesType = items.filter(item => item.mimeType == "application/vnd.google-apps.site");
 
-  driveStats["fileStats"]["sharedWithMe"] = filesSharedWithMe;
-  driveStats["folderStats"]["sharedWithMe"] = foldersSharedWithMe;
-  driveStats["imageStats"]["sharedWithMe"] = imagesSharedWithMe;
-  driveStats["audioStats"]["sharedWithMe"] = audiosSharedWithMe;
-  driveStats["videoStats"]["sharedWithMe"] = videosSharedWithMe;
-  driveStats["scriptStats"]["sharedWithMe"] = scriptsSharedWithMe;
-  driveStats["drawingStats"]["sharedWithMe"] = drawingsSharedWithMe;
-  driveStats["siteStats"]["sharedWithMe"] = sitesSharedWithMe;
+    let filesOwnedByAuthUser = items.filter(item => item.owners[0].isAuthenticatedUser).length;
+    let foldersOwnedByAuthUser = foldersType.filter(item => item.owners[0].isAuthenticatedUser).length;
+    let imagesOwnedByAuthUser = imagesType.filter(item => item.owners[0].isAuthenticatedUser).length;
+    let audiosOwnedByAuthUser = audiosType.filter(item => item.owners[0].isAuthenticatedUser).length;
+    let videosOwnedByAuthUser = videosType.filter(item => item.owners[0].isAuthenticatedUser).length;
+    let scriptsOwnedByAuthUser = scriptsType.filter(item => item.owners[0].isAuthenticatedUser).length;
+    let drawingsOwnedByAuthUser = drawingsType.filter(item => item.owners[0].isAuthenticatedUser).length;
+    let sitesOwnedByAuthUser = sitesType.filter(item => item.owners[0].isAuthenticatedUser).length;
+
+    filesOwnedByMe += filesOwnedByAuthUser;
+    foldersOwnedByMe += foldersOwnedByAuthUser;
+    imagesOwnedByMe += imagesOwnedByAuthUser;
+    audiosOwnedByMe += audiosOwnedByAuthUser;
+    videosOwnedByMe += videosOwnedByAuthUser;
+    scriptsOwnedByMe += scriptsOwnedByAuthUser;
+    drawingsOwnedByMe += drawingsOwnedByAuthUser;
+    sitesOwnedByMe += sitesOwnedByAuthUser;
+
+    filesSharedWithMe += (items.length - filesOwnedByAuthUser);
+    foldersSharedWithMe += (foldersType.length - foldersOwnedByAuthUser);
+    imagesSharedWithMe += (imagesType.length - imagesOwnedByAuthUser);
+    audiosSharedWithMe += (audiosType.length - audiosOwnedByAuthUser);
+    videosSharedWithMe += (videosType.length - videosOwnedByAuthUser);
+    scriptsSharedWithMe += (scriptsType.length - scriptsOwnedByAuthUser);
+    drawingsSharedWithMe += (drawingsType.length - drawingsOwnedByAuthUser);
+    sitesSharedWithMe += (sitesType.length - sitesOwnedByAuthUser);
+
+  } while (allMyStuff.nextPageToken);
+
+  driveStats["fileStats"] = {
+    "ownedByMe": filesOwnedByMe,
+    "sharedWithMe": filesSharedWithMe
+  };
+  driveStats["folderStats"] = {
+    "ownedByMe": foldersOwnedByMe,
+    "sharedWithMe": foldersSharedWithMe
+  };
+  driveStats["imageStats"] = {
+    "ownedByMe": imagesOwnedByMe,
+    "sharedWithMe": imagesSharedWithMe
+  };
+  driveStats["audioStats"] = {
+    "ownedByMe": audiosOwnedByMe,
+    "sharedWithMe": audiosSharedWithMe
+  };
+  driveStats["videoStats"] = {
+    "ownedByMe": videosOwnedByMe,
+    "sharedWithMe": videosSharedWithMe
+  };
+  driveStats["scriptStats"] = {
+    "ownedByMe": scriptsOwnedByMe,
+    "sharedWithMe": scriptsSharedWithMe
+  };
+  driveStats["drawingStats"] = {
+    "ownedByMe": drawingsOwnedByMe,
+    "sharedWithMe": drawingsSharedWithMe
+  };
+  driveStats["siteStats"] = {
+    "ownedByMe": sitesOwnedByMe,
+    "sharedWithMe": sitesSharedWithMe
+  };
 
   console.log(driveStats);
   return driveStats;
