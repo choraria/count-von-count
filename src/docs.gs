@@ -72,42 +72,40 @@ function getDocsCard() {
 }
 
 function docsData() {
+  const start = new Date();
+
   let docsCount = {};
 
-  let docsOwnedByMe = {};
+  let allDocs = {};
   let docOwner = 0;
-
-  do {
-    docsOwnedByMe = Drive.Files.list({
-      q: "mimeType = 'application/vnd.google-apps.document' and 'me' in owners and trashed = false",
-      pageToken: docsOwnedByMe.nextPageToken,
-    });
-    docOwner = docOwner + docsOwnedByMe.items.length;
-  } while (docsOwnedByMe.nextPageToken);
-
-  docsCount["owner"] = docOwner;
-
-  let docsShared = {};
   let docSharedWithMe = 0;
+
   let otherOwners = [];
 
   do {
-    docsShared = Drive.Files.list({
-      q: "mimeType = 'application/vnd.google-apps.document' and sharedWithMe = true and trashed = false",
-      pageToken: docsShared.nextPageToken,
+    allDocs = Drive.Files.list({
+      q: "mimeType = 'application/vnd.google-apps.document' and ('me' in owners or sharedWithMe = true) and trashed = false",
+      pageToken: allDocs.nextPageToken,
+      maxResults: 460,
     });
-    let sharedItems = docsShared.items;
 
-    for (var i = 0; i < sharedItems.length; i++) {
-      otherOwners.push(sharedItems[i].owners[0].emailAddress);
+    let items = allDocs.items;
+    let docsOwnedByAuthUser = items.filter(item => item.owners[0].isAuthenticatedUser).length;
+    let docsSharedWithAuthUser = items.filter(item => !item.owners[0].isAuthenticatedUser);
+    docOwner += docsOwnedByAuthUser;
+    docSharedWithMe += docsSharedWithAuthUser.length;
+
+    for (var i = 0; i < docsSharedWithAuthUser.length; i++) {
+      otherOwners.push(docsSharedWithAuthUser[i].owners[0].emailAddress);
     }
 
-    docSharedWithMe = docSharedWithMe + sharedItems.length;
-  } while (docsShared.nextPageToken);
+  } while (allDocs.nextPageToken);
 
-  docsCount["sharedWithMe"] = docSharedWithMe;
-  docsCount["helped"] = otherOwners.filter((x, i, a) => a.indexOf(x) === i).length;
-
+  docsCount = {
+    "owner": docOwner,
+    "sharedWithMe": docSharedWithMe,
+    "helped": otherOwners.filter((x, i, a) => a.indexOf(x) === i).length
+  }
   console.log(docsCount);
   return docsCount;
 }
