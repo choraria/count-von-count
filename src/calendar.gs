@@ -28,11 +28,13 @@ function getCalendarCard() {
     .setText("Calendar stats")
     .setButton(refreshButton);
 
+  calendarStats.timeOut ? header.setTopLabel("TOO MANY INVITES!").setBottomLabel("Partial stats fetched.") : header;
+
   const attendedStats = CardService.newDecoratedText()
     .setIconUrl("https://raw.githubusercontent.com/schoraria911/google-apps-script/master/Random/Icons/ACCEPTED.png")
     .setIconAltText("CONFIRMED")
     .setTopLabel("YES")
-    .setText("Accepted: " + calendarStats.attended + " invites")
+    .setText(`Accepted: ${calendarStats.timeOut && calendarStats.attended > 0 ? "~" + calendarStats.attended : calendarStats.attended} invites`)
     // .setBottomLabel("---")
     // .setOnClickAction(action)
     .setWrapText(false);
@@ -41,7 +43,7 @@ function getCalendarCard() {
     .setIconUrl("https://raw.githubusercontent.com/schoraria911/google-apps-script/master/Random/Icons/CANCELLED.png")
     .setIconAltText("CANCELLED")
     .setTopLabel("NO")
-    .setText("Cancelled: " + calendarStats.declined + " invites")
+    .setText(`Cancelled: ${calendarStats.timeOut && calendarStats.declined > 0 ? "~" + calendarStats.declined : calendarStats.declined} invites`)
     // .setBottomLabel("---")
     // .setOnClickAction(action)
     .setWrapText(false);
@@ -50,7 +52,7 @@ function getCalendarCard() {
     .setIconUrl("https://raw.githubusercontent.com/schoraria911/google-apps-script/master/Random/Icons/TENTATIVE.png")
     .setIconAltText("TENTATIVE")
     .setTopLabel("MAY BE")
-    .setText("Were unsure about: " + calendarStats.maybees + " invites")
+    .setText(`Were unsure about: ${calendarStats.timeOut && calendarStats.maybees > 0 ? "~" + calendarStats.maybees : calendarStats.maybees} invites`)
     .setBottomLabel("API BUG")
     // .setOnClickAction(action)
     .setWrapText(false);
@@ -59,7 +61,7 @@ function getCalendarCard() {
     .setIconUrl("https://raw.githubusercontent.com/schoraria911/google-apps-script/master/Random/Icons/SELF.png")
     .setIconAltText("HOSTED")
     .setTopLabel("CREATED")
-    .setText("Hosted: " + calendarStats.hosted + " meetings")
+    .setText(`Hosted: ${calendarStats.timeOut && calendarStats.hosted > 0 ? "~" + calendarStats.hosted : calendarStats.hosted} meetings`)
     // .setBottomLabel("---")
     // .setOnClickAction(action)
     .setWrapText(false);
@@ -102,35 +104,43 @@ function calendarData() {
   let maybees = 0;
   let hosted = 0;
 
+  let timeOut = true;
+
   do {
-    events = Calendar.Events.list("primary", {
-      pageToken: events.nextPageToken,
-      maxResults: 2450,
-    });
+    if (!isTimeUp(start)) {
+      timeOut = false;
+      events = Calendar.Events.list("primary", {
+        pageToken: events.nextPageToken,
+        maxResults: 2500,
+      });
 
-    let items = events.items;
-    attended += items.filter(event => event.status == "confirmed").length;
-    declined += items.filter(event => event.status == "cancelled").length;
-    maybees += items.filter(event => event.status == "tentative").length;
-    hosted += items.filter(function (event) {
-      let selfEvents;
-      try {
-        selfEvents = event.creator.self;
-        if (selfEvents == true) {
-          return event;
+      let items = events.items;
+      attended += items.filter(event => event.status == "confirmed").length;
+      declined += items.filter(event => event.status == "cancelled").length;
+      maybees += items.filter(event => event.status == "tentative").length;
+      hosted += items.filter(function (event) {
+        let selfEvents;
+        try {
+          selfEvents = event.creator.self;
+          if (selfEvents == true) {
+            return event;
+          }
+        } catch (e) {
+          // console.log({ e });
         }
-      } catch (e) {
-        // console.log({ e });
-      }
-    }).length;
-
+      }).length;
+    } else {
+      timeOut = true;
+      break;
+    }
   } while (events.nextPageToken);
 
   eventsCount = {
     "attended": attended,
     "declined": declined,
     "maybees": maybees,
-    "hosted": hosted
+    "hosted": hosted,
+    "timeOut": timeOut
   }
 
   console.log(eventsCount);
