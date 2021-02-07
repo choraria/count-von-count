@@ -97,8 +97,8 @@ function getDriveCard() {
     .setIconUrl("https://raw.githubusercontent.com/schoraria911/google-apps-script/master/Random/Icons/SITES.png")
     .setIconAltText("SITE")
     .setTopLabel("SITES")
-    .setText("Builder: " + driveStats.siteStats.ownedByMe + " sites")
-    .setBottomLabel("Shared with me: " + driveStats.siteStats.sharedWithMe + " sites")
+    .setText(`Builder: ${driveStats.timeOut.status && driveStats.siteStats.ownedByMe > 0 ? "~" + driveStats.siteStats.ownedByMe : driveStats.siteStats.ownedByMe} sites`)
+    .setBottomLabel(`Shared with me: ${driveStats.timeOut.status && driveStats.siteStats.sharedWithMe > 0 ? "~" + driveStats.siteStats.sharedWithMe : driveStats.siteStats.sharedWithMe} sites`)
     // .setOnClickAction(action)
     .setWrapText(false);
 
