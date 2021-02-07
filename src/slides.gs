@@ -20,9 +20,9 @@ function getSlidesCard() {
     .setLoadIndicator(CardService.LoadIndicator.SPINNER);
 
   const refreshButton = CardService.newTextButton()
-      .setText('REFRESH')
-      .setOnClickAction(action)
-      .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
+    .setText('REFRESH')
+    .setOnClickAction(action)
+    .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
 
   const header = CardService.newDecoratedText()
     .setText("Slides stats")
@@ -72,42 +72,40 @@ function getSlidesCard() {
 }
 
 function slidesData() {
+  const start = new Date();
+
   let slidesCount = {};
 
-  let slidesOwnedByMe = {};
+  let allSlides = {};
   let slideOwner = 0;
-
-  do {
-    slidesOwnedByMe = Drive.Files.list({
-      q: "mimeType = 'application/vnd.google-apps.presentation' and 'me' in owners and trashed = false",
-      pageToken: slidesOwnedByMe.nextPageToken,
-    });
-    slideOwner = slideOwner + slidesOwnedByMe.items.length;
-  } while (slidesOwnedByMe.nextPageToken);
-
-  slidesCount["owner"] = slideOwner;
-
-  let slidesShared = {};
   let slidesSharedWithMe = 0;
+
   let otherOwners = [];
 
   do {
-    slidesShared = Drive.Files.list({
-      q: "mimeType = 'application/vnd.google-apps.presentation' and sharedWithMe = true and trashed = false",
-      pageToken: slidesShared.nextPageToken,
+    allSlides = Drive.Files.list({
+      q: "mimeType = 'application/vnd.google-apps.presentation' and ('me' in owners or sharedWithMe = true) and trashed = false",
+      pageToken: allSlides.nextPageToken,
+      maxResults: 460,
     });
-    let sharedItems = slidesShared.items;
 
-    for (var i = 0; i < sharedItems.length; i++) {
-      otherOwners.push(sharedItems[i].owners[0].emailAddress);
+    let items = allSlides.items;
+    let slidesOwnedByAuthUser = items.filter(item => item.owners[0].isAuthenticatedUser).length;
+    let slidesSharedWithAuthUser = items.filter(item => !item.owners[0].isAuthenticatedUser);
+    slideOwner += slidesOwnedByAuthUser;
+    slidesSharedWithMe += slidesSharedWithAuthUser.length;
+
+    for (var i = 0; i < slidesSharedWithAuthUser.length; i++) {
+      otherOwners.push(slidesSharedWithAuthUser[i].owners[0].emailAddress);
     }
 
-    slidesSharedWithMe = slidesSharedWithMe + sharedItems.length;
-  } while (slidesShared.nextPageToken);
+  } while (allSlides.nextPageToken);
 
-  slidesCount["sharedWithMe"] = slidesSharedWithMe;
-  slidesCount["helped"] = otherOwners.filter((x, i, a) => a.indexOf(x) === i).length;
-
+  slidesCount = {
+    "owner": slideOwner,
+    "sharedWithMe": slidesSharedWithMe,
+    "helped": otherOwners.filter((x, i, a) => a.indexOf(x) === i).length
+  }
   console.log(slidesCount);
   return slidesCount;
 }
