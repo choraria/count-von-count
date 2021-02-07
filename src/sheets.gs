@@ -20,9 +20,9 @@ function getSheetsCard() {
     .setLoadIndicator(CardService.LoadIndicator.SPINNER);
 
   const refreshButton = CardService.newTextButton()
-      .setText('REFRESH')
-      .setOnClickAction(action)
-      .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
+    .setText('REFRESH')
+    .setOnClickAction(action)
+    .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
 
   const header = CardService.newDecoratedText()
     .setText("Sheets stats")
@@ -72,42 +72,40 @@ function getSheetsCard() {
 }
 
 function sheetsData() {
+  const start = new Date();
+
   let sheetsCount = {};
 
-  let sheetsOwnedByMe = {};
+  let allSheets = {};
   let sheetOwner = 0;
-
-  do {
-    sheetsOwnedByMe = Drive.Files.list({
-      q: "mimeType = 'application/vnd.google-apps.spreadsheet' and 'me' in owners and trashed = false",
-      pageToken: sheetsOwnedByMe.nextPageToken,
-    });
-    sheetOwner = sheetOwner + sheetsOwnedByMe.items.length;
-  } while (sheetsOwnedByMe.nextPageToken);
-
-  sheetsCount["owner"] = sheetOwner;
-
-  let sheetsShared = {};
   let sheetSharedWithMe = 0;
+
   let otherOwners = [];
 
   do {
-    sheetsShared = Drive.Files.list({
-      q: "mimeType = 'application/vnd.google-apps.spreadsheet' and sharedWithMe = true and trashed = false",
-      pageToken: sheetsShared.nextPageToken,
+    allSheets = Drive.Files.list({
+      q: "mimeType = 'application/vnd.google-apps.spreadsheet' and ('me' in owners or sharedWithMe = true) and trashed = false",
+      pageToken: allSheets.nextPageToken,
+      maxResults: 460,
     });
-    let sharedItems = sheetsShared.items;
 
-    for (var i = 0; i < sharedItems.length; i++) {
-      otherOwners.push(sharedItems[i].owners[0].emailAddress);
+    let items = allSheets.items;
+    let sheetsOwnedByAuthUser = items.filter(item => item.owners[0].isAuthenticatedUser).length;
+    let sheetsSharedWithAuthUser = items.filter(item => !item.owners[0].isAuthenticatedUser);
+    sheetOwner += sheetsOwnedByAuthUser;
+    sheetSharedWithMe += sheetsSharedWithAuthUser.length;
+
+    for (var i = 0; i < sheetsSharedWithAuthUser.length; i++) {
+      otherOwners.push(sheetsSharedWithAuthUser[i].owners[0].emailAddress);
     }
 
-    sheetSharedWithMe = sheetSharedWithMe + sharedItems.length;
-  } while (sheetsShared.nextPageToken);
+  } while (allSheets.nextPageToken);
 
-  sheetsCount["sharedWithMe"] = sheetSharedWithMe;
-  sheetsCount["helped"] = otherOwners.filter((x, i, a) => a.indexOf(x) === i).length;
-
+  sheetsCount = {
+    "owner": sheetOwner,
+    "sharedWithMe": sheetSharedWithMe,
+    "helped": otherOwners.filter((x, i, a) => a.indexOf(x) === i).length
+  }
   console.log(sheetsCount);
   return sheetsCount;
 }
