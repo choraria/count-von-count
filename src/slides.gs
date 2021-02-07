@@ -28,11 +28,13 @@ function getSlidesCard() {
     .setText("Slides stats")
     .setButton(refreshButton);
 
+  slidesStats.timeOut ? header.setTopLabel("TOO MANY SLIDES!").setBottomLabel("Partial stats fetched.") : header;
+
   const slidesOwned = CardService.newDecoratedText()
     .setIconUrl("https://raw.githubusercontent.com/schoraria911/google-apps-script/master/Random/Icons/SELF.png")
     .setIconAltText("CREATOR")
     .setTopLabel("PRESENTER")
-    .setText("Created: " + slidesStats.owner + " slides")
+    .setText(`Created: ${slidesStats.timeOut && slidesStats.owner > 0 ? "~" + slidesStats.owner : slidesStats.owner} slides`)
     // .setBottomLabel("---")
     // .setOnClickAction(action)
     .setWrapText(false);
@@ -41,8 +43,8 @@ function getSlidesCard() {
     .setIconUrl("https://raw.githubusercontent.com/schoraria911/google-apps-script/master/Random/Icons/SHARED.png")
     .setIconAltText("SHARED")
     .setTopLabel("COLLABORATOR")
-    .setText("Shared with me: " + slidesStats.sharedWithMe + " slides")
-    .setBottomLabel("Helped: " + slidesStats.helped + " people")
+    .setText(`Shared with me: ${slidesStats.timeOut && slidesStats.sharedWithMe > 0 ? "~" + slidesStats.sharedWithMe : slidesStats.sharedWithMe} slides`)
+    .setBottomLabel(`Helped: ${slidesStats.timeOut && slidesStats.helped > 0 ? "~" + slidesStats.helped : slidesStats.helped} people`)
     // .setOnClickAction(action)
     .setWrapText(false);
 
@@ -82,29 +84,37 @@ function slidesData() {
 
   let otherOwners = [];
 
+  let timeOut = true;
+
   do {
-    allSlides = Drive.Files.list({
-      q: "mimeType = 'application/vnd.google-apps.presentation' and ('me' in owners or sharedWithMe = true) and trashed = false",
-      pageToken: allSlides.nextPageToken,
-      maxResults: 460,
-    });
+    if (!isTimeUp(start)) {
+      timeOut = false;
+      allSlides = Drive.Files.list({
+        q: "mimeType = 'application/vnd.google-apps.presentation' and ('me' in owners or sharedWithMe = true) and trashed = false",
+        pageToken: allSlides.nextPageToken,
+        maxResults: 460,
+      });
 
-    let items = allSlides.items;
-    let slidesOwnedByAuthUser = items.filter(item => item.owners[0].isAuthenticatedUser).length;
-    let slidesSharedWithAuthUser = items.filter(item => !item.owners[0].isAuthenticatedUser);
-    slideOwner += slidesOwnedByAuthUser;
-    slidesSharedWithMe += slidesSharedWithAuthUser.length;
+      let items = allSlides.items;
+      let slidesOwnedByAuthUser = items.filter(item => item.owners[0].isAuthenticatedUser).length;
+      let slidesSharedWithAuthUser = items.filter(item => !item.owners[0].isAuthenticatedUser);
+      slideOwner += slidesOwnedByAuthUser;
+      slidesSharedWithMe += slidesSharedWithAuthUser.length;
 
-    for (var i = 0; i < slidesSharedWithAuthUser.length; i++) {
-      otherOwners.push(slidesSharedWithAuthUser[i].owners[0].emailAddress);
+      for (var i = 0; i < slidesSharedWithAuthUser.length; i++) {
+        otherOwners.push(slidesSharedWithAuthUser[i].owners[0].emailAddress);
+      }
+    } else {
+      timeOut = true;
+      break;
     }
-
   } while (allSlides.nextPageToken);
 
   slidesCount = {
     "owner": slideOwner,
     "sharedWithMe": slidesSharedWithMe,
-    "helped": otherOwners.filter((x, i, a) => a.indexOf(x) === i).length
+    "helped": otherOwners.filter((x, i, a) => a.indexOf(x) === i).length,
+    "timeOut": timeOut
   }
   console.log(slidesCount);
   return slidesCount;
