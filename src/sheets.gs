@@ -28,11 +28,13 @@ function getSheetsCard() {
     .setText("Sheets stats")
     .setButton(refreshButton);
 
+  sheetsStats.timeOut ? header.setTopLabel("TOO MANY SHEETS!").setBottomLabel("Partial stats fetched.") : header;
+
   const sheetsOwned = CardService.newDecoratedText()
     .setIconUrl("https://raw.githubusercontent.com/schoraria911/google-apps-script/master/Random/Icons/SELF.png")
     .setIconAltText("CREATOR")
     .setTopLabel("CREATOR")
-    .setText("Built: " + sheetsStats.owner + " sheets")
+    .setText(`Built: ${sheetsStats.timeOut && sheetsStats.owner > 0 ? "~" + sheetsStats.owner : sheetsStats.owner} sheets`)
     // .setBottomLabel("---")
     // .setOnClickAction(action)
     .setWrapText(false);
@@ -41,8 +43,8 @@ function getSheetsCard() {
     .setIconUrl("https://raw.githubusercontent.com/schoraria911/google-apps-script/master/Random/Icons/SHARED.png")
     .setIconAltText("SHARED")
     .setTopLabel("COLLABORATOR")
-    .setText("Shared with me: " + sheetsStats.sharedWithMe + " sheets")
-    .setBottomLabel("Helped: " + sheetsStats.helped + " people")
+    .setText(`Shared with me: ${sheetsStats.timeOut && sheetsStats.sharedWithMe > 0 ? "~" + sheetsStats.sharedWithMe : sheetsStats.sharedWithMe} sheets`)
+    .setBottomLabel(`Helped: ${sheetsStats.timeOut && sheetsStats.helped > 0 ? "~" + sheetsStats.helped : sheetsStats.helped} people`)
     // .setOnClickAction(action)
     .setWrapText(false);
 
@@ -82,29 +84,37 @@ function sheetsData() {
 
   let otherOwners = [];
 
+  let timeOut = true;
+
   do {
-    allSheets = Drive.Files.list({
-      q: "mimeType = 'application/vnd.google-apps.spreadsheet' and ('me' in owners or sharedWithMe = true) and trashed = false",
-      pageToken: allSheets.nextPageToken,
-      maxResults: 460,
-    });
+    if (!isTimeUp(start)) {
+      timeOut = false;
+      allSheets = Drive.Files.list({
+        q: "mimeType = 'application/vnd.google-apps.spreadsheet' and ('me' in owners or sharedWithMe = true) and trashed = false",
+        pageToken: allSheets.nextPageToken,
+        maxResults: 460,
+      });
 
-    let items = allSheets.items;
-    let sheetsOwnedByAuthUser = items.filter(item => item.owners[0].isAuthenticatedUser).length;
-    let sheetsSharedWithAuthUser = items.filter(item => !item.owners[0].isAuthenticatedUser);
-    sheetOwner += sheetsOwnedByAuthUser;
-    sheetSharedWithMe += sheetsSharedWithAuthUser.length;
+      let items = allSheets.items;
+      let sheetsOwnedByAuthUser = items.filter(item => item.owners[0].isAuthenticatedUser).length;
+      let sheetsSharedWithAuthUser = items.filter(item => !item.owners[0].isAuthenticatedUser);
+      sheetOwner += sheetsOwnedByAuthUser;
+      sheetSharedWithMe += sheetsSharedWithAuthUser.length;
 
-    for (var i = 0; i < sheetsSharedWithAuthUser.length; i++) {
-      otherOwners.push(sheetsSharedWithAuthUser[i].owners[0].emailAddress);
+      for (var i = 0; i < sheetsSharedWithAuthUser.length; i++) {
+        otherOwners.push(sheetsSharedWithAuthUser[i].owners[0].emailAddress);
+      }
+    } else {
+      timeOut = true;
+      break;
     }
-
   } while (allSheets.nextPageToken);
 
   sheetsCount = {
     "owner": sheetOwner,
     "sharedWithMe": sheetSharedWithMe,
-    "helped": otherOwners.filter((x, i, a) => a.indexOf(x) === i).length
+    "helped": otherOwners.filter((x, i, a) => a.indexOf(x) === i).length,
+    "timeOut": timeOut
   }
   console.log(sheetsCount);
   return sheetsCount;
